@@ -1,0 +1,616 @@
+answer_llm,answer_orig,document,question,course
+"Based on the provided context, the syntax for using `precision_recall_fscore_support` in Python is:
+
+```
+from sklearn.metrics import precision_recall_fscore_support
+precision, recall, fscore, support = precision_recall_fscore_support(y_val, y_val_pred, zero_division=0)
+```
+
+Note that `y_val` and `y_val_pred` should be replaced with your actual test labels and predictions, respectively.","Scikit-learn offers another way: precision_recall_fscore_support
+Example:
+from sklearn.metrics import precision_recall_fscore_support
+precision, recall, fscore, support = precision_recall_fscore_support(y_val, y_val_pred, zero_division=0)
+(Gopakumar Gopinathan)",403bbdd8,What is the syntax for using precision_recall_fscore_support in Python?,machine-learning-zoomcamp
+"According to the FAQ database, when using waitress to serve the app.py for making predictions, you should modify your scripts to avoid pickle errors by:
+
+Put the class into a separate module and import it in both the script that saves the model (e.g. train.py) and the script that loads the model (e.g. predict.py)
+
+This is because pickle will reference the class in the global namespace (`__main__` module) when saving the model, but waitress will load the predict App module and pickle will try to find `__main__.<custom_class>` which does not exist.","When running a docker container with waitress serving the app.py for making predictions, pickle will throw an error that can't get attribute <name_of_class> on module __main__.
+This does not happen when Flask is used directly, i.e. not through waitress.
+The problem is that the model uses a custom column transformer class, and when the model was saved, it was saved from the __main__ module (e.g. python train.py). Pickle will reference the class in the global namespace (top-level code): __main__.<custom_class>.
+When using waitress, waitress will load the predict_app module and this will call pickle.load, that will try to find __main__.<custom_class> that does not exist.
+Solution:
+Put the class into a separate module and import it in both the script that saves the model (e.g. train.py) and the script that loads the model (e.g. predict.py)
+Note: If Flask is used (no waitress) in predict.py, and predict.py has the definition of the class, When  it is run: python predict.py, it will work because the class is in the same namespace as the one used when the model was saved (__main__).
+Detailed info: https://stackoverflow.com/questions/27732354/unable-to-load-files-using-pickle-and-multiple-modules
+Marcos MJD",236864c2,How should I modify my scripts to avoid pickle errors when using waitress?,machine-learning-zoomcamp
+"Based on the provided context, the answer to the QUESTION ""What command launches a container image in interactive mode?"" is:
+
+`docker run -it --entrypoint bash <image>`
+
+This command is mentioned in the FAQ section ""5. Deploying Machine Learning Models"", in the answer to the question ""How do I debug a docker container?""","Launch the container image in interactive mode and overriding the entrypoint, so that it starts a bash command.
+docker run -it --entrypoint bash <image>
+If the container is already running, execute a command in the specific container:
+docker ps (find the container-id)
+docker exec -it <container-id> bash
+(Marcos MJD)",63a81b57,What command launches a container image in interactive mode?,machine-learning-zoomcamp
+"Based on the provided context, the answer to the question ""Can we make a pull request for homework solutions using Pytorch?"" is:
+
+Yes, one can make a pull request with the equivalent solution using Pytorch for lessons and homework!","Pytorch is also a deep learning framework that allows to do equivalent tasks as keras. Here is a tutorial to create a CNN from scratch using pytorch :
+https://blog.paperspace.com/writing-cnns-from-scratch-in-pytorch/
+The functions have similar goals. The syntax can be slightly different. For the lessons and the homework, we use keras, but one can feel free to make a pull request with the equivalent with pytorch for lessons and homework!
+Mélanie Fouesnard",c4ff26e5,Can we make a pull request for homework solutions using Pytorch?,machine-learning-zoomcamp
+"Based on the provided context, the QUESTION is: ""What might be the cause of the pip version error in this week's serverless deep learning section?""
+
+The answer is not explicitly stated in the context. However, it is mentioned in section 5. Deploying Machine Learning Models, that there are issues with pip version due to version conflicts. In particular, user Bhaskar Sarma mentions that there can be issues when different versions of Scikit-Learn are used for training and deployment. This could be a possible cause of the pip version error.
+
+Additionally, section 5. Deploying Machine Learning Models, user Gopakumar Gopinathan mentions that HOMEWORK asks to install Scikit-Learn version 1.3.1. This could also be a cause of the pip version error if the correct version is not installed.
+
+There are other errors mentioned in the context, such as user Odimegwu David mentioning that running ""pipenv install scikit-learn==1.0.2"" gives errors, and user Alejandro Aponte mentioning that running ""pipenv install"" gives a resolution failure. However, these are not directly related to the serverless deep learning section, and are likely different issues.","When running docker build -t dino-dragon-model it returns the above error
+The most common source of this error in this week is because Alex video shows a version of the wheel with python 8, we need to find a wheel with the version that we are working on. In this case python 9. Another common error is to copy the link, this will also produce the same error, we need to download the raw format:
+https://github.com/alexeygrigorev/tflite-aws-lambda/raw/main/tflite/tflite_runtime-2.7.0-cp39-cp39-linux_x86_64.whl
+Pastor Soto",42c09143,What might be the cause of the pip version error in this week's serverless deep learning section?,machine-learning-zoomcamp
+"Based on the provided FAQ database and the context of the question, the answer to ""What command do we run after editing the metrics-server to check the HPA status again?"" is:
+
+>>kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+Or, alternatively:
+
+>>kubectl apply -f https://raw.githubusercontent.com/Peco602/ml-zoomcamp/main/10-kubernetes/kube-config/metrics-server-deployment.yaml
+
+These commands update the metrics-server deployment with the changes made to the configuration file.","In case the HPA instance does not run correctly even after installing the latest version of Metrics Server from the components.yaml manifest with:
+>>kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+And the targets still appear as <unknown>
+Run >>kubectl edit deploy -n kube-system metrics-server
+And search for this line:
+args:
+- --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+Add this line in the middle:  - --kubelet-insecure-tls
+So that it stays like this:
+args:
+- --kubelet-insecure-tls
+- --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+Save and run again >>kubectl get hpa
+Added by Marilina Orihuela",df023a13,What command do we run after editing the metrics-server to check the HPA status again?,machine-learning-zoomcamp
+"A question about AWS CLI version for eksctl compatibility!
+
+According to the FAQ, the answer is to make sure you are on AWS CLI v2 (check with `aws --version`).","Make sure you are on AWS CLI v2 (check with aws --version)
+https://docs.aws.amazon.com/cli/latest/userguide/cliv2-migration-instructions.html",00882c83,How can I check my AWS CLI version for eksctl compatibility?,machine-learning-zoomcamp
+"Based on the provided CONTEXT, the QUESTION ""What is one main reason for different accuracy values?"" is related to section 4. Evaluation Metrics for Classification.
+
+According to the answer in that section, ""One main reason behind that, is the way of splitting data. For example, we want to split data into train/validation/test with the ratios 60%/20%/20% respectively. Although the following two options end up with the same ratio, the data itself is a bit different and not 100% matching in each case.""
+
+So, the main reason for different accuracy values is the way of splitting the data.","One main reason behind that, is the way of splitting data. For example, we want to split data into train/validation/test with the ratios 60%/20%/20% respectively.
+Although the following two options end up with the same ratio, the data itself is a bit different and not 100% matching in each case.
+1)
+df_train, df_temp = train_test_split(df, test_size=0.4, random_state=42)
+df_val, df_test = train_test_split(df_temp, test_size=0.5, random_state=42)
+2)
+df_full_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
+df_train, df_val = train_test_split(df_full_train, test_size=0.25, random_state=42)
+Therefore, I would recommend using the second method which is more consistent with the lessons and thus the homeworks.
+Ibraheem Taha",25481ce5,What is one main reason for different accuracy values?,machine-learning-zoomcamp
+"What should I do if I lose the REMOTE_URI variable after the session ends?
+
+According to the FAQ, if you lose the REMOTE_URI variable after the session ends, you can set a local variable (REMOTE_URI) and assign your URI address in the terminal. For example, `REMOTE_URI=2278222782.dkr.ecr.ap-south-1.amazonaws.com/clothing-tflite-images` (replace with your own URI).","Solution description
+In the unit 9.6, Alexey ran the command echo ${REMOTE_URI} which turned the URI address in the terminal. There workaround is to set a local variable (REMOTE_URI) and assign your URI address in the terminal and use it to login the registry, for instance, REMOTE_URI=2278222782.dkr.ecr.ap-south-1.amazonaws.com/clothing-tflite-images (fake address). One caveat is that you will lose this variable once the session is terminated.
+I also had the same problem on Ubuntu terminal. I executed the following two commands:
+$ export REMOTE_URI=1111111111.dkr.ecr.us-west-1.amazonaws.com/clothing-tflite-images:clothing-model-xception-v4-001
+$ echo $REMOTE_URI
+111111111.dkr.ecr.us-west-1.amazonaws.com/clothing-tflite-images:clothing-model-xception-v4-001
+Note: 1. no curly brackets (e.g. echo ${REMOTE_URI}) needed unlike in video 9.6,
+2. Replace REMOTE_URI with your URI
+(Bhaskar Sarma)",60fa95ed,What should I do if I lose the REMOTE_URI variable after the session ends?,machine-learning-zoomcamp
+"Based on the provided context, the answer to the question ""Where can I find the script for generating the Kitchenware Classification Competition dataset?"" is:
+
+The script for generating the Kitchenware Classification Competition dataset can be found here: kitchenware-dataset-generator | Kaggle","The image dataset for the competition was in a different layout from what we used in the dino vs dragon lesson. Since that’s what was covered, some folks were more comfortable with that setup, so I wrote a script that would generate it for them
+It can be found here: kitchenware-dataset-generator | Kaggle
+Martin Uribe",20174c95,Where can I find the script for generating the Kitchenware Classification Competition dataset?,machine-learning-zoomcamp
+"Based on the CONTEXT provided, the solution for the TensorFlow Serving error on Apple M1 Mac is given in two scenarios.
+
+Scenario 1: For the error ""Error: Status: Downloaded newer image for tensorflow/serving:2.7.0\n[libprotobuf FATAL external/com_google_protobuf/src/google/protobuf/generated_message_reflection.cc:2345] CHECK failed: file != nullptr: terminate called after throwing an instance of 'google::protobuf::FatalException'\nwhat():  CHECK failed: file != nullptr: qemu: uncaught target signal 6 (Aborted) - core dumped\n/usr/bin/tf_serving_entrypoint.sh: line 3:     8 Aborted                 tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name=${MODEL_NAME} --model_base_path=${MODEL_BASE_PATH}/${MODEL_NAME} ""$@"":
+
+The solution is to use the image 'emacski/tensorflow-serving:latest-linux_arm64'.
+
+Scenario 2: For the error ""Illegal instruction"" with the latest image 'tensorflow/serving':
+
+The solution is to use the 'bitnami/tensorflow-serving:2' base image. You can launch it using docker run or docker-compose.yaml.","While trying to run the docker code on M1:
+docker run --platform linux/amd64 -it --rm \
+-p 8500:8500 \
+-v $(pwd)/clothing-model:/models/clothing-model/1 \
+-e MODEL_NAME=""clothing-model"" \
+tensorflow/serving:2.7.0
+It outputs the error:
+Error:
+Status: Downloaded newer image for tensorflow/serving:2.7.0
+[libprotobuf FATAL external/com_google_protobuf/src/google/protobuf/generated_message_reflection.cc:2345] CHECK failed: file != nullptr:
+terminate called after throwing an instance of 'google::protobuf::FatalException'
+what():  CHECK failed: file != nullptr:
+qemu: uncaught target signal 6 (Aborted) - core dumped
+/usr/bin/tf_serving_entrypoint.sh: line 3:     8 Aborted                 tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name=${MODEL_NAME} --model_base_path=${MODEL_BASE_PATH}/${MODEL_NAME} ""$@""
+Solution
+docker pull emacski/tensorflow-serving:latest
+docker run -it --rm \
+-p 8500:8500 \
+-v $(pwd)/clothing-model:/models/clothing-model/1 \
+-e MODEL_NAME=""clothing-model"" \
+emacski/tensorflow-serving:latest-linux_arm64
+See more here: https://github.com/emacski/tensorflow-serving-arm
+Added by Daniel Egbo",5bda3b94,What is the solution for the TensorFlow Serving error on Apple M1 Mac?,machine-learning-zoomcamp
+"I'm a Course Teaching Assistant for Machine Learning Zoomcamp.
+
+You're asking about steps to resolve a `NotSupportedError` in section 5. Unfortunately, the context does not provide any information about a `NotSupportedError` in section 5. It only provides examples of other error messages and their resolutions. Therefore, I cannot provide a specific answer to your question.
+
+However, if you're referring to the `TypeError: Descriptors cannot be created directly.` error in the context, the solution mentioned in the FAQ database is to downgrade the protobuf package to version 3.20.1 by running `pipenv install protobuf==3.20.1`.","Question:
+When executing
+eb local run  --port 9696
+I get the following error:
+ERROR: NotSupportedError - You can use ""eb local"" only with preconfigured, generic and multicontainer Docker platforms.
+Answer:
+There are two options to fix this:
+Re-initialize by running eb init -i and choosing the options from a list (the first default option for docker platform should be fine).
+Edit the ‘.elasticbeanstalk/config.yml’ directly changing the default_platform from Docker to default_platform: Docker running on 64bit Amazon Linux 2023
+The disadvantage of the second approach is that the option might not be available the following years
+Added by Alex Litvinov",d04e77f8,What steps can I take to resolve the NotSupportedError in section 5?,machine-learning-zoomcamp
+"The question is ""Who added the solution for fixing the 'Failed to find data adapter' error in the Keras model training?""
+
+Based on the context from the FAQ database, the solution was added by Tzvi Friedman.","While training a Keras model you get the error “Failed to find data adapter that can handle input: <class 'keras.src.preprocessing.image.ImageDataGenerator'>, <class 'NoneType'>” you may have unintentionally passed the image generator instead of the dataset to the model
+train_gen = ImageDataGenerator(rescale=1./255)
+train_ds = train_gen.flow_from_directory(…)
+history_after_augmentation = model.fit(
+train_gen, # this should be train_ds!!!
+epochs=10,
+validation_data=test_gen # this should be test_ds!!!
+)
+The fix is simple and probably obvious once pointed out, use the training and validation dataset (train_ds and val_ds) returned from flow_from_directory
+Added by Tzvi Friedman",62722d72,Who added the solution for fixing the 'Failed to find data adapter' error in the Keras model training?,machine-learning-zoomcamp
+"Based on the provided CONTEXT, the ANSWER to the QUESTION ""What's the first step to install kind through choco?"" is:
+
+First, you need to launch a PowerShell terminal with administrator privilege. Then, you need to install Choco Library first through the following syntax in PowerShell:
+
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))","First you need to launch a powershell terminal with administrator privilege.
+For this we need to install choco library first through the following syntax in powershell:
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+Krishna Anand",03b5fc59,What's the first step to install kind through choco?,machine-learning-zoomcamp
+"Based on the provided context, the QUESTION is asking for a method to fetch data for homework using the requests library.
+
+The relevant section in the FAQ database is:
+
+section: 2. Machine Learning for Regression
+question: Alternative way to load the data using requests
+answer: ...
+
+Here is the answer provided:
+```
+import requests
+url = 'https://raw.githubusercontent.com/alexeygrigorev/datasets/master/housing.csv'
+response = requests.get(url)
+if response.status_code == 200:
+  with open('housing.csv', 'wb') as file:
+    file.write(response.content)
+else:
+  print(""Download failed."")
+```
+
+So, the method to fetch data for homework using the requests library is to use the following code:
+```
+import requests
+url = 'https://raw.githubusercontent.com/alexeygrigorev/datasets/master/housing.csv'
+response = requests.get(url)
+if response.status_code == 200:
+  with open('housing.csv', 'wb') as file:
+    file.write(response.content)
+else:
+  print(""Download failed."")
+```
+This code retrieves the data from the provided URL and saves it to a local file named 'housing.csv'.","Above users showed how to load the dataset directly from github. Here is another useful way of doing this using the `requests` library:
+# Get data for homework
+import requests
+url = 'https://raw.githubusercontent.com/alexeygrigorev/datasets/master/housing.csv'
+response = requests.get(url)
+if response.status_code == 200:
+with open('housing.csv', 'wb') as file:
+file.write(response.content)
+else:
+print(""Download failed."")
+Tyler Simpson",8d209d6d,Could you share a method to fetch data for homework using the requests library?,machine-learning-zoomcamp
+"Based on the CONTEXT, the answer to the QUESTION ""Can I use mean_squared_error to compute RMSE in one step?"" is:
+
+Yes, you can use the mean_squared_error function from sklearn.metrics to compute RMSE in one step by setting the squared kwarg to False.
+
+For example:
+
+rms = mean_squared_error(y_actual, y_predicted, squared=False)
+
+This will return the RMSE directly.","Instead of using np.sqrt() as the second step. You can extract it using like this way :
+mean_squared_error(y_val, y_predict_val,squared=False)
+Ahmed Okka",a7e7cdd2,Can I use mean_squared_error to compute RMSE in one step?,machine-learning-zoomcamp
+"According to the provided FAQ database, the question ""Where can I find documentation on how Lambda functions are initialized?"" can be answered as follows:
+
+You can find documentation on how Lambda functions are initialized in the AWS Lambda documentation. Specifically, the following resources were mentioned:
+https://docs.aws.amazon.com/lambda/latest/dg/images-create.html
+https://docs.aws.amazon.com/lambda/latest/dg/runtimes-api.html
+
+These documents provide information on how Lambda container images work and how Lambda functions are initialized.","I wanted to understand how lambda container images work in depth and how lambda functions are initialized, for this reason, I found the following documentation
+https://docs.aws.amazon.com/lambda/latest/dg/images-create.html
+https://docs.aws.amazon.com/lambda/latest/dg/runtimes-api.html
+Added by Alejandro aponte",4d98cd09,Where can I find documentation on how Lambda functions are initialized?,machine-learning-zoomcamp
+"Based on the provided context, the answer to the question ""Could you explain how to read data from a GitHub URL using pandas?"" is:
+
+The dataset can be read directly to pandas dataframe from the github link using the technique shown below:
+
+dfh=pd.read_csv(""https://raw.githubusercontent.com/alexeygrigorev/datasets/master/housing.csv"")
+
+Alternatively, you can use the `requests` library:
+
+import requests
+url = 'https://raw.githubusercontent.com/alexeygrigorev/datasets/master/housing.csv'
+response = requests.get(url)
+if response.status_code == 200:
+with open('housing.csv', 'wb') as file:
+file.write(response.content)
+else:
+print(""Download failed."")
+
+Both of these methods allow you to read the dataset directly from a GitHub URL using pandas.","The dataset can be read directly to pandas dataframe from the github link using the technique shown below
+dfh=pd.read_csv(""https://raw.githubusercontent.com/alexeygrigorev/datasets/master/housing.csv"")
+Krishna Anand",0b3eaf92,Could you explain how to read data from a GitHub URL using pandas?,machine-learning-zoomcamp
+"Based on the provided context, I'll answer the question:
+
+Why do all my missing values end up in the training dataframe when using a random seed of 42?
+
+The context suggests that the issue is due to the random seed value being used consistently throughout the data split. The answer mentions that using a seed value ensures that all learners are on the same page by getting the same behavior (in this case, all missing values ending up in the training dataframe). If a different seed value is used (e.g., 9), missing values will then appear in all other dataframes.","One of the questions on the homework calls for using a random seed of 42. When using 42, all my missing values ended up in my training dataframe and not my validation or test dataframes, why is that?
+The purpose of the seed value is to randomly generate the proportion split. Using a seed of 42 ensures that all learners are on the same page by getting the same behavior (in this case, all missing values ending up in the training dataframe). If using a different seed value (e.g. 9), missing values will then appear in all other dataframes.",48aac030,Why do all my missing values end up in the training dataframe when using a random seed of 42?,machine-learning-zoomcamp
+"Since you're asking about ""Where can I find the materials related to my cohort?"", I'll answer based on the context.
+
+According to the answer provided in the FAQ database, you can find the course materials by:
+
+1. Going to the course page (http://mlzoomcamp.com/) and scrolling down to start going through the course materials.
+2. Reading everything in the cohort folder for your cohort's year.
+
+Please note that the FAQ doesn't provide a direct link to access the cohort materials, but it gives you the steps to follow to find them.","Welcome to the course! Go to the course page (http://mlzoomcamp.com/), scroll down and start going through the course materials. Then read everything in the cohort folder for your cohort’s year.
+Click on the links and start watching the videos. Also watch office hours from previous cohorts. Go to DTC youtube channel and click on Playlists and search for {course yyyy}. ML Zoomcamp was first launched in 2021.
+Or you can just use this link: http://mlzoomcamp.com/#syllabus",0a278fb2,Where can I find the materials related to my cohort?,machine-learning-zoomcamp
+"Based on the context, the answer to the QUESTION ""Is there a link to learn more about the California housing dataset?"" is:
+
+You can find a detailed description of the dataset ere https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_california_housing.html","You can find a detailed description of the dataset ere https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_california_housing.html
+KS",27c2d90a,Is there a link to learn more about the California housing dataset?,machine-learning-zoomcamp
+"According to the context from the FAQ database, the algorithms that represent bagging and boosting in this course are:
+
+* Bagging: Random Forest
+* Boosting: XGBoost","For ensemble algorithms, during the week 6, one bagging algorithm and one boosting algorithm were presented: Random Forest and XGBoost, respectively.
+Random Forest trains several models in parallel. The output can be, for example, the average value of all the outputs of each model. This is called bagging.
+XGBoost trains several models sequentially: the previous model error is used to train the following model. Weights are used to ponderate the models such as the best models have higher weights and are therefore favored for the final output. This method is called boosting.
+Note that boosting is not necessarily better than bagging.
+Mélanie Fouesnard
+Bagging stands for “Bootstrap Aggregation” - it involves taking multiple samples with replacement to derive multiple training datasets from the original training dataset (bootstrapping), training a classifier (e.g. decision trees or stumps for Random Forests) on each such training dataset, and then combining the the predictions (aggregation) to obtain the final prediction. For classification, predictions are combined via voting; for regression, via averaging. Bagging can be done in parallel, since the various classifiers are independent. Bagging decreases variance (but not bias) and is robust against overfitting.
+Boosting, on the other hand, is sequential - each model learns from the mistakes of its predecessor. Observations are given different weights - observations/samples misclassified by the previous classifier are given a higher weight, and this process is continued until a stopping condition is reached (e.g. max. No. of models is reached, or error is acceptably small, etc.). Boosting reduces bias & is generally more accurate than bagging, but can be prone to overfitting.
+Rileen",a55b29ff,Which algorithms represent bagging and boosting in your course?,machine-learning-zoomcamp
+"Based on the context, the answer to the question ""Who contributed the information about using metrics on a series or dataframe in section 4?"" is:
+
+~~Ella Sahnan~~","https://datatalks-club.slack.com/archives/C0288NJ5XSA/p1696475675887119
+Metrics can be used on a series or a dataframe
+~~Ella Sahnan~~",a52d4739,Who contributed the information about using metrics on a series or dataframe in section 4?,machine-learning-zoomcamp
+"A QUESTION from the FAQ database!
+
+Based on the provided CONTEXT, I'm assuming we're referring to the ""Machine Learning for Regression"" section.
+
+To answer your QUESTION:
+
+""I found a video that explains the normal form derivation for regression. It's called 'Normal Equation Derivation for Regression' and it's a good resource for understanding how we got the normal form with linear regression.""
+
+So, yes, I can suggest a video that explains the normal form derivation for regression.",I found this video pretty usual for understanding how we got the normal form with linear regression Normal Equation Derivation for Regression,bd4a1395,Can you suggest a video that explains the normal form derivation for regression?,machine-learning-zoomcamp
+"Here's the answer based on the context:
+
+A: Yes, Google Cloud Platform offers free services for a long period. As mentioned in the context, both AWS and GCP provide microinstances for free for a very long time, and a bunch more free stuff.","Q: Hii folks, I tried deploying my docker image on Render, but it won't I get SIGTERM everytime.
+I think .5GB RAM is not enough, is there any other free alternative available ?
+A: aws (amazon), gcp (google), saturn.
+Both aws and gcp give microinstance for free for a VERY long time, and a bunch more free stuff.
+Saturn even provides free GPU instances. Recent promo link from mlzoomcamp for Saturn:
+“You can sign up here: https://bit.ly/saturn-mlzoomcamp
+When you sign up, write in the chat box that you're an ML Zoomcamp student and you should get extra GPU hours (something like 150)”
+Added by Andrii Larkin",aa13dd66,Does Google Cloud Platform offer any free services for a long period?,machine-learning-zoomcamp
+"Based on the context, the answer to the question ""Where can I find a guide for using Docker in Google Colab?"" is:
+
+Here is a way to work with Docker in Google Colab: https://gist.github.com/mwufi/6718b30761cd109f9aff04c5144eb885","I’ve tried to do everything in Google Colab. Here is a way to work with Docker in Google Colab:
+https://gist.github.com/mwufi/6718b30761cd109f9aff04c5144eb885
+%%shell
+pip install udocker
+udocker --allow-root install
+!udocker --allow-root run hello-world
+Added by Ivan Brigida
+Lambda API Gateway errors:
+`Authorization header requires 'Credential' parameter. Authorization header requires 'Signature' parameter. Authorization header requires 'SignedHeaders' parameter. Authorization header requires existence of either a 'X-Amz-Date' or a 'Date' header.`
+`Missing Authentication Token`
+import boto3
+client = boto3.client('apigateway')
+response = client.test_invoke_method(
+restApiId='your_rest_api_id',
+resourceId='your_resource_id',
+httpMethod='POST',
+pathWithQueryString='/test/predict', #depend how you set up the api
+body='{""url"": ""https://habrastorage.org/webt/rt/d9/dh/rtd9dhsmhwrdezeldzoqgijdg8a.jpeg""}'
+)
+print(response['body'])
+Yishan Zhan
+Unable to run pip install tflite_runtime from github wheel links?
+To overcome this issue, you can download the whl file to your local project folder and in the Docker file add the following lines:
+COPY <file-name> .
+RUN pip install <file-name>
+Abhijit Chakraborty",d4f9efdc,Where can I find a guide for using Docker in Google Colab?,machine-learning-zoomcamp
+"The command to import the required function for RMSE calculation is:
+`from sklearn.metrics import mean_squared_error`","We can use sklearn & numpy packages to calculate Root Mean Squared Error
+from sklearn.metrics import mean_squared_error
+import numpy as np
+Rmse = np.sqrt(mean_squared_error(y_pred, y_val/ytest)
+Added by Radikal Lukafiardi
+You can also refer to Alexey’s notebook for Week 2:
+https://github.com/alexeygrigorev/mlbookcamp-code/blob/master/chapter-02-car-price/02-carprice.ipynb
+which includes the following code:
+def rmse(y, y_pred):
+error = y_pred - y
+mse = (error ** 2).mean()
+return np.sqrt(mse)
+(added by Rileen Sinha)",618ad97a,What is the command from sklearn to import the required function for RMSE calculation?,machine-learning-zoomcamp
+"Based on the context, if the region is configured by default, the alternative command is not mentioned in the provided FAQs. The region configuration is only mentioned in the context of configuring AWS after installing awscli, but it does not provide an alternative command for when the region is configured by default.","As per AWS documentation:
+https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html
+You need to do: (change the fields in red)
+aws ecr get-login-password --region region | docker login --username AWS --password-stdin aws_account_id.dkr.ecr.region.amazonaws.com
+Alternatively you can run the following command without changing anything given you have a default region configured
+aws ecr get-login-password --region $(aws configure get region) | docker login --username AWS --password-stdin ""$(aws sts get-caller-identity --query ""Account"" --output text).dkr.ecr.$(aws configure get region).amazonaws.com""
+Added by Humberto Rodriguez",f9711723,What is the alternative command if the region is configured by default?,machine-learning-zoomcamp
+"According to the CONTEXT, the pandas function that directly computes the standard deviation from a series is `std()`. This can be called directly on the series, for example `pandas.Series(x).std()`.","If we have a list or series of data for example x = [1,2,3,4,5]. We can use pandas to find the standard deviation. We can pass our list into panda series and call standard deviation directly on the series pandas.Series(x).std().
+(Quinn Avila)",7cd652c5,Which pandas function directly computes the standard deviation from a series?,machine-learning-zoomcamp
+"Based on the CONTEXT, the QUESTION asks: What is the default value for the number of workers in the fit function?
+
+From the CONTEXT, we can see that in both answers, the default value for the number of workers in the fit function is **1**.
+
+Answer: The default value for the number of workers in the fit function is 1.","When training the models, in the fit function, you can specify the number of workers/threads.
+The number of threads apparently also works for GPUs, and came very handy in google colab for the T4 GPU, since it was very very slow, and workers default value is 1.
+I changed the workers variable to 2560, following this thread in stackoverflow. I am using the free T4 GPU.  (https://stackoverflow.com/questions/68208398/how-to-find-the-number-of-cores-in-google-colabs-gpu)
+Added by Ibai Irastorza",daf84bc3,What is the default value for the number of workers in the fit function?,machine-learning-zoomcamp
+"Here's the answer based on the provided context:
+
+If your Keras model *.h5 doesn't load due to an optimizer error, you should add `compile=False` to the `load_model` function:
+
+```
+keras.models.load_model('model_name.h5', compile=False)
+```
+
+This solution is based on the answer provided in the FAQ database for the section ""Serverless Deep Learning"".","Solution: add compile = False to the load_model function
+keras.models.load_model('model_name.h5', compile=False)
+Nadia Paz",7daaca73,What should I do if my Keras model *.h5 doesn't load due to an optimizer error?,machine-learning-zoomcamp
+"Based on the provided CONTEXT, here's the answer to the QUESTION:
+
+""How can I verify the results of my own code for evaluation metrics?""
+
+You can verify the results of your own code for evaluation metrics by using scikit-learn's off-the-shelf calculations. Specifically, you can use the `accuracy_score`, `precision_score`, `recall_score`, `f1_score`, and `roc_auc_score` functions to compute your model's evaluation metrics. This approach saves time and provides more precise results compared to calculating these metrics from scratch using NumPy and Pandas libraries.
+
+As an example, you can use the following code:
+```python
+from sklearn.metrics import (accuracy_score,
+                            precision_score,
+                            recall_score,
+                            f1_score,
+                            roc_auc_score
+)
+
+accuracy = accuracy_score(y_val, y_pred)
+precision = precision_score(y_val, y_pred)
+recall = recall_score(y_val, y_pred)
+f1 = f1_score(y_val, y_pred)
+roc_auc = roc_auc_score(y_val, y_pred)
+
+print(f'Accuracy: {accuracy}')
+print(f'Precision: {precision}')
+print(f'Recall: {recall}')
+print(f'F1-Score: {f1}')
+print(f'ROC AUC: {roc_auc}')
+```","I am getting multiple thresholds with the same F1 score, does this indicate I am doing something wrong or is there a method for choosing? I would assume just pick the lowest?
+Choose the one closest to any of the options
+Added by Azeez Enitan Edunwale
+You can always use scikit-learn (or other standard libraries/packages) to verify results obtained using your own code, e.g. you can use  “classification_report” (https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html) to obtain precision, recall and F1-score.
+Added by Rileen Sinha",b431e7eb,How can I verify the results of my own code for evaluation metrics?,machine-learning-zoomcamp
+"ANSWER:
+
+According to the context, the application of regularization techniques depends on the specific situation and problem. It is recommended to consider it when training machine learning models, especially with small datasets or complex models, to prevent overfitting. However, its necessity varies depending on the data quality and size. Evaluate each case individually to determine if it is needed.
+
+In this case, the question asks whether we need to always use regularization techniques in machine learning. The answer is no, we don't always need to use regularization techniques. We should consider the specific situation and problem, and evaluate each case individually to determine if it is needed.","The application of regularization depends on the specific situation and problem. It is recommended to consider it when training machine learning models, especially with small datasets or complex models, to prevent overfitting. However, its necessity varies depending on the data quality and size. Evaluate each case individually to determine if it is needed.
+(Daniel Muñoz Viveros)",c21f99f5,Do we need to always use regularization techniques in machine learning?,machine-learning-zoomcamp
+"According to the context, the role of `np.sign` in determining the intercept between precision and recall curves is to find the index (or indices) at which the sign of the difference between precision and recall changes. This is done by using `np.diff(np.sign(np.array(df_scores[""precision""]) - np.array(df_scores[""recall""])))`, where `df_scores` contains columns 'threshold', 'precision' and 'recall'. The `np.sign` function is used to identify the sign of the differences between precision and recall values, which changes at the intercept point.","You can find the intercept between these two curves using numpy diff (https://numpy.org/doc/stable/reference/generated/numpy.diff.html ) and sign (https://numpy.org/doc/stable/reference/generated/numpy.sign.html):
+I suppose here that you have your df_scores ready with your three columns ‘threshold’, ‘precision’ and ‘recall’:
+You want to know at which index (or indices) you have your intercept between precision and recall (namely: where the sign of the difference between precision and recall changes):
+idx = np.argwhere(
+np.diff(
+np.sign(np.array(df_scores[""precision""]) - np.array(df_scores[""recall""]))
+)
+).flatten()
+You can print the result to easily read it:
+print(
+f""The precision and recall curves intersect at a threshold equal to {df_scores.loc[idx]['threshold']}.""
+)
+(Mélanie Fouesnard)",1427d567,What is the role of np.sign in determining the intercept between precision and recall curves?,machine-learning-zoomcamp
+"Based on the provided context, here is the answer to the QUESTION:
+
+""How can I solve the issue of running out of storage after building many docker images?""
+
+**Solution:** 
+To solve the issue of running out of storage after building many docker images, you need to remove unused docker images and then run `docker system prune` to free up the space. 
+
+Additionally, for future reference, it is recommended to use the `--rm` flag when running containers to automatically remove them after they are no longer needed.","Problem description
+Due to experimenting back and forth so much without care for storage, I just ran out of it on my 30-GB AWS instance.
+My first reflex was to remove some zoomcamp directories, but of course those are mostly code so it didn’t help much.
+Solution description
+> docker images
+revealed that I had over 20 GBs worth of superseded / duplicate models lying around, so I proceeded to > docker rmi
+a bunch of those — but to no avail!
+It turns out that deleting docker images does not actually free up any space as you might expect. After removing images, you also need to run
+> docker system prune
+See also: https://stackoverflow.com/questions/36799718/why-removing-docker-containers-and-images-does-not-free-up-storage-space-on-wind
+Added by Konrad Mühlberg",c5cde96c,How can I solve the issue of running out of storage after building many docker images?,machine-learning-zoomcamp
+"Based on the provided context, the QUESTION is: ""In which order are folders read when determining numeric class labels in flow_from_directory in TensorFlow?""
+
+The ANSWER can be found in the section 8. Neural Networks and Deep Learning, question ""How are numeric class labels determined in flow_from_directory using binary class mode and what is meant by the single probability predicted by a binary Keras model?""
+
+The answer is: Folders will be read in alphabetical order. For example, in the case of a folder named ""dino"", and another named ""dragon"", ""dino"" will read first and will have class label 0, whereas ""dragon"" will be read in next and will have class label 1.","The command to read folders in the dataset in the tensorflow source code is:
+for subdir in sorted(os.listdir(directory)):
+…
+Reference: https://github.com/keras-team/keras/blob/master/keras/preprocessing/image.py, line 563
+This means folders will be read in alphabetical order. For example, in the case of a folder named dino, and another named dragon, dino will read first and will have class label 0, whereas dragon will be read in next and will have class label 1.
+When a Keras model predicts binary labels, it will only return one value, and this is the probability of class 1 in case of sigmoid activation function in the last dense layer with 2 neurons. The probability of class 0 can be found out by:
+prob(class(0)) = 1- prob(class(1))
+In case of using from_logits to get results, you will get two values for each of the labels.
+A prediction of 0.8 is saying the probability that the image has class label 1 (in this case dragon), is 0.8, and conversely we can infer the probability that the image has class label 0 is 0.2.
+(Added by Memoona Tahira)",9fad096e,In which order are folders read when determining numeric class labels in flow_from_directory in TensorFlow?,machine-learning-zoomcamp
+"Based on the CONTEXT, the QUESTION is: ""Which file should I modify to fix Docker's DNS settings?""
+
+The answer can be found in the FAQ entry titled ""Docker Temporary failure in name resolution"" under section 9. Serverless Deep Learning. The answer states: ""Add the next lines to `vim /etc/docker/daemon.json`...""","Add the next lines to vim /etc/docker/daemon.json
+{
+""dns"": [""8.8.8.8"", ""8.8.4.4""]
+}
+Then, restart docker:  sudo service docker restart
+Ibai Irastorza",1078aeb7,Which file should I modify to fix Docker's DNS settings?,machine-learning-zoomcamp
+"Based on the provided CONTEXT, there is no specific number of models required for the midterm mentioned. The answer to the question ""How many models should I train?"" from the same section is ""train as many as you can. The term ""multiple"" implies having more than one model, so as long as you have more than one, you're on the right track.""","Regarding Point 4 in the midterm deliverables, which states, ""Train multiple models, tune their performance, and select the best model,"" you might wonder, how many models should you train? The answer is simple: train as many as you can. The term ""multiple"" implies having more than one model, so as long as you have more than one, you're on the right track.",fbaa5b20,Is there a specific number of models required for the midterm?,machine-learning-zoomcamp
+"Based on the provided FAQs from the ""Machine Learning Zoomcamp"" course, specifically from section 4. Evaluation Metrics for Classification, here is the answer to the question:
+
+""Why does a threshold of 1.0 result in FPR being 0.0?""
+
+The answer is that when the threshold is 1.0, the condition for belonging to the positive class (churn class) is g(x) >= 1.0. Since the sigmoid function g(x) can never equal 1.0 exactly, there is no object (or instance) for which the churn-condition could be satisfied. As a result, there are no positive (churn) predicted values (neither true positive nor false positive) when the threshold is equal to 1.0. Therefore, the FPR is 0.0.","For churn/not churn predictions, I need help to interpret the following scenario please, what is happening when:
+The threshold is 1.0
+FPR is 0.0
+And TPR is 0.0
+When the threshold is 1.0, the condition for belonging to the positive class (churn class) is g(x)>=1.0 But g(x) is a sigmoid function for a binary classification problem. It has values between 0 and 1. This function  never becomes equal to outermost values, i.e. 0 and 1.
+That is why there is no object, for which churn-condition could be satisfied. And that is why there is no any positive  (churn) predicted value (neither true positive, nor false positive), if threshold is equal to 1.0
+Alena Kniazeva",746342ff,Why does a threshold of 1.0 result in FPR being 0.0?,machine-learning-zoomcamp
+"Based on the provided context, the pandas method to calculate the standard deviation of a series is `std()`.","If we have a list or series of data for example x = [1,2,3,4,5]. We can use pandas to find the standard deviation. We can pass our list into panda series and call standard deviation directly on the series pandas.Series(x).std().
+(Quinn Avila)",7cd652c5,What is the pandas method to calculate the standard deviation of a series?,machine-learning-zoomcamp
+"Based on the provided context, the answer to the question ""Why don't we include df_train_full for the correlation matrix task?"" is:
+
+""Just to make sure here we are only dealing with df_train. The reason behind this is that df_train_full also contains the validation dataset, so at this stage we don't want to make conclusions based on the validation data, since we want to test how we did without using that portion of the data.""
+
+This answer is from the FAQ section 3, Machine Learning for Classification, question: What data should we use for correlation matrix. The answer clearly states that only df_train should be used, and not df_train_full, to avoid using validation data.","Q2 asks about correlation matrix and converting median_house_value from numeric to binary. Just to make sure here we are only dealing with df_train not df_train_full, right? As the question explicitly mentions the train dataset.
+Yes. I think it is only on df_train. The reason behind this is that df_train_full also contains the validation dataset, so at this stage we don't want to make conclusions based on the validation data, since we want to test how we did without using that portion of the data.
+Pastor Soto",d2043cf5,Why don't we include df_train_full for the correlation matrix task?,machine-learning-zoomcamp
+"To set up a Conda environment on your computer, you should run the command ""conda create -n ..."" only once to create the environment, and then run ""conda activate ml-zoomcamp"" whenever you want to use it.","Yes. Whoever corrects the homework will only be able to access the link if the repository is public.
+(added by Tano Bugelli)
+How to install Conda environment in my local machine?
+Which ide is recommended for machine learning?",1e60e888,How can I set up a Conda environment on my computer?,machine-learning-zoomcamp
+"Based on the provided CONTEXT and the QUESTION you asked, I'll do my best to help you.
+
+You asked: How can I fix a ValueError related to feature names when using XGBoost?
+
+The CONTEXT suggests that the ValueError is due to feature names containing characters like ""<"" that are not supported. The suggested solution is to replace those problematic characters with supported ones. You can do this by replacing ""<"" with ""_"" for example:
+
+features = [f.replace('=<', '_').replace('=', '_') for f in features]
+
+Alternatively, you can avoid specifying feature names while creating the xgb.DMatrix, but this might not be recommended.
+
+Let me know if this helps or if you have any further questions!","If you’re getting TypeError:
+“TypeError: Expecting a sequence of strings for feature names, got: <class 'numpy.ndarray'>”,
+probably you’ve done this:
+features = dv.get_feature_names_out()
+It gets you np.ndarray instead of list. Converting to list list(features) will not fix this, read below.
+If you’re getting ValueError:
+“ValueError: feature_names must be string, and may not contain [, ] or <”,
+probably you’ve either done:
+features = list(dv.get_feature_names_out())
+or:
+features = dv.feature_names_
+reason is what you get from DictVectorizer here looks like this:
+['households',
+'housing_median_age',
+'latitude',
+'longitude',
+'median_income',
+'ocean_proximity=<1H OCEAN',
+'ocean_proximity=INLAND',
+'population',
+'total_bedrooms',
+'total_rooms']
+it has symbols XGBoost doesn’t like ([, ] or <).
+What you can do, is either do not specify “feature_names=” while creating xgb.DMatrix or:
+import re
+features = dv.feature_names_
+pattern = r'[\[\]<>]'
+features = [re.sub(pattern, '  ', f) for f in features]
+Added by Andrii Larkin",c920eef3,How can I fix a ValueError related to feature names when using XGBoost?,machine-learning-zoomcamp
+"Based on the context, the question ""How can I resolve the 'Cannot connect to the docker daemon' issue on WSL?"" corresponds to the section ""10. Kubernetes and TensorFlow Serving"" with the question ""WSL Cannot Connect To Docker Daemon"".
+
+The answer is: The solution is simple. The Docker Desktop might no longer be connecting to the WSL Linux distro. What you need to do is go to your Docker Desktop setting and then click on resources. Under resources, click on WSL Integration. You will get a tab like the image below: Just enable additional distros. That’s all. Even if the additional distro is the same as the default WSL distro.","Working on getting Docker installed - when I try running hello-world I am getting the error.
+Docker: Cannot connect to the docker daemon at unix:///var/run/docker.sock. Is the Docker daemon running ?
+Solution description
+If you’re getting this error on WSL, re-install your docker: remove the docker installation from WSL and install Docker Desktop on your host machine (Windows).
+On Linux, start the docker daemon with either of these commands:
+sudo dockerd
+sudo service docker start
+Added by Ugochukwu Onyebuchi",4b2a3181,How can I resolve the 'Cannot connect to the docker daemon' issue on WSL?,machine-learning-zoomcamp
+"Based on the provided context, I'll answer the QUESTION: 'Is it mandatory to complete the midterm project for the certificate?'
+
+According to the context, it is not mandatory to complete the midterm project for the certificate. In fact, the answer from the FAQ database is:
+
+""What If I submitted only two projects and failed to submit the third?
+answer: If you have submitted two projects (and peer-reviewed at least 3 course-mates’ projects for each submission), you will get the certificate for the course. According to the course coordinator, Alexey Grigorev, only two projects are needed to get the course certificate.
+
+So, as long as you submit at least two projects and complete the peer-review tasks, you will still be eligible for a certificate.","Yes, it's possible. See the previous answer.",1d644223,Is it mandatory to complete the midterm project for the certificate?,machine-learning-zoomcamp
+"Based on the provided context, I found a question that might be relevant to your query: ""What commands should I use to start the docker daemon on Linux?""
+
+Unfortunately, there is no direct answer to this question in the provided context. However, I can suggest that you use the `docker` command with the `start` option to start the Docker daemon. You can find the detailed instructions on the official Docker documentation webpage.
+
+Here is the command:
+```
+docker start
+```
+Please note that if you are using a Linux system, you may need to use `systemctl` or `service` command to manage the Docker service. For example:
+```
+sudo systemctl start docker
+```
+or
+```
+sudo service docker start
+```
+Please refer to the official Docker documentation or your system's documentation for more information.","Working on getting Docker installed - when I try running hello-world I am getting the error.
+Docker: Cannot connect to the docker daemon at unix:///var/run/docker.sock. Is the Docker daemon running ?
+Solution description
+If you’re getting this error on WSL, re-install your docker: remove the docker installation from WSL and install Docker Desktop on your host machine (Windows).
+On Linux, start the docker daemon with either of these commands:
+sudo dockerd
+sudo service docker start
+Added by Ugochukwu Onyebuchi",4b2a3181,What commands should I use to start the docker daemon on Linux?,machine-learning-zoomcamp
+"Based on the CONTEXT, the answer to the QUESTION is:
+
+Am I eligible for certification if I missed the midterm project?
+
+According to the previous answer, ""Yes, it's possible."" Additionally, from a different answer, ""If you have submitted two projects (and peer-reviewed at least 3 course-mates’ projects for each submission), you will get the certificate for the course."" This implies that missing the midterm project (which is likely one of the three projects) does not necessarily disqualify you from getting a certificate, as long as you have submitted two projects and reviewed at least three peers' projects by the deadline.","Yes, it's possible. See the previous answer.",1d644223,Am I eligible for certification if I missed the midterm project?,machine-learning-zoomcamp
+"According to the CONTEXT, to install md5sum on Mac, you should use the command:
+
+`% brew install md5sha1sum`","Install it by using command
+% brew install md5sha1sum
+Then run command to check hash for file to check if they the same with the provided
+% md5sum model1.bin dv.bin
+Olga Rudakova",4ea80460,Which tool do I use to install md5sum on Mac?,machine-learning-zoomcamp
+"Based on the CONTEXT, I can answer the QUESTION:
+
+""How can I transfer files to a Docker container from my local machine?""
+
+Answer: You can copy files from your local machine into a Docker container using the `docker cp` command. The basic syntax is:
+
+`docker cp /path/to/local/file_or_directory container_id:/path/in/container`
+
+Note that you can use double quotes or parentheses to specify the filenames and paths.","You can copy files from your local machine into a Docker container using the docker cp command. Here's how to do it:
+To copy a file or directory from your local machine into a running Docker container, you can use the `docker cp command`. The basic syntax is as follows:
+docker cp /path/to/local/file_or_directory container_id:/path/in/container
+Hrithik Kumar Advani",3f97f50f,How can I transfer files to a Docker container from my local machine?,machine-learning-zoomcamp
+"A great question!
+
+According to the context, I found a related answer in section 4. Evaluation Metrics for Classification, which is relevant to the YouTube video you're asking about.
+
+The answer to ""Do you have a YouTube video covering Evaluation Metrics for Classification?"" is: **No**, I couldn't find any specific YouTube video mentioned in the provided answers.
+
+However, the context does mention some relevant information about evaluating models using scikit-learn metrics, as well as tips on getting classification metrics, beautiful classification reports, and even XGBoost evaluation metrics.","Week 4 HW: https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/master/cohorts/2023/04-evaluation/homework.md
+All HWs: https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/master/cohorts/2023/
+Evaluation Matrix: https://docs.google.com/spreadsheets/d/e/2PACX-1vQCwqAtkjl07MTW-SxWUK9GUvMQ3Pv_fF8UadcuIYLgHa0PlNu9BRWtfLgivI8xSCncQs82HDwGXSm3/pubhtml
+GitHub for theory: https://github.com/alexeygrigorev/mlbookcamp-code/tree/master/course-zoomcamp
+YouTube Link: 4.X --- https://www.youtube.com/watch?v=gmg5jw1bM8A&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=40
+Sci-Kit Learn on Evaluation:
+https://scikit-learn.org/stable/model_selection.html
+~~Nukta Bhatia~~",27c8d5da,Do you have a YouTube video covering Evaluation Metrics for Classification?,machine-learning-zoomcamp
