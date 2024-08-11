@@ -88,6 +88,9 @@ def llm(prompt, model_choice):
             messages=[{"role": "user", "content": prompt}]
         )
         answer = response.choices[0].message.content
+        # Remove the 'json' prefix and extra space after the curly brace
+        answer = answer.replace('json{  ', '{')
+
         tokens = {
             'prompt_tokens': response.usage.prompt_tokens,
             'completion_tokens': response.usage.completion_tokens,
@@ -135,9 +138,10 @@ def evaluate_relevance(question, answer):
     """.strip()
 
     prompt = prompt_template.format(question=question, answer=answer)
-    evaluation, tokens, _ = llm(prompt, 'openai/gpt-4o-mini')
+    evaluation, tokens, _ = llm(prompt, 'ollama/phi3')
     
     try:
+        print(evaluation)
         json_eval = json.loads(evaluation)
         return json_eval['Relevance'], json_eval['Explanation'], tokens
     except json.JSONDecodeError:
@@ -167,7 +171,8 @@ def get_answer(query, course, model_choice, search_type):
     
     relevance, explanation, eval_tokens = evaluate_relevance(query, answer)
 
-    openai_cost = calculate_openai_cost(model_choice, tokens)
+    #openai_cost = calculate_openai_cost(model_choice, tokens)
+    openai_cost = 0
  
     return {
         'answer': answer,
