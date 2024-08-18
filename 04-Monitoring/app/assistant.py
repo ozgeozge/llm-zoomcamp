@@ -88,8 +88,8 @@ def llm(prompt, model_choice):
             messages=[{"role": "user", "content": prompt}]
         )
         answer = response.choices[0].message.content
-        # Remove the 'json' prefix and extra space after the curly brace
-        answer = answer.replace('json{  ', '{')
+        # Remove the 'json' prefix and extra characters
+        answer = answer.replace('```json', '').replace('```', '')
 
         tokens = {
             'prompt_tokens': response.usage.prompt_tokens,
@@ -112,7 +112,7 @@ def llm(prompt, model_choice):
     
     end_time = time.time()
     response_time = end_time - start_time
-    
+    print (answer)
     return answer, tokens, response_time
 
 
@@ -141,7 +141,6 @@ def evaluate_relevance(question, answer):
     evaluation, tokens, _ = llm(prompt, 'ollama/phi3')
     
     try:
-        print(evaluation)
         json_eval = json.loads(evaluation)
         return json_eval['Relevance'], json_eval['Explanation'], tokens
     except json.JSONDecodeError:
